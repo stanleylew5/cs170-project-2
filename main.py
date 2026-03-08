@@ -29,6 +29,13 @@ def nearestNeighbor(data: list[list[float]], classes: list[int], featureIndices:
         if nearestNeighborClass == classes[i]: correct += 1
     return correct / n
 
+def forwardSelection(data: list[list[float]], classes: list[int], numFeatures: int) -> None:
+    print("Hello World!")
+
+def backwardsElimination(data: list[list[float]], classes: list[int], numFeatures: int) -> None:
+    print("Hello World!")
+
+
 def main():
     print("Welcome to Stanley's Search Algorithm!\n")
     fileName = input("Type in the name of the file to test: ").strip()
@@ -47,6 +54,10 @@ def main():
     print(f"This dataset has {numFeatures} features (not including the class attribute), with {numInstances} instances.\n")
     print(f"Running nearest neighbor with all {numFeatures} features, using \"leave-one-out\" evaluation, I get an accuracy of {nearestNeighborAccuracy * 100:.2f}%")
 
-
+    match algorithm:
+        case "1": forwardSelection(data, classes, numFeatures)
+        case "2": backwardsElimination(data, classes, numFeatures)
+        case _: print("Invalid algorithm choice. Please choose either 1 or 2.")
+    
 if __name__ == "__main__":
     main()
