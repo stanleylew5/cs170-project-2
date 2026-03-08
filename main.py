@@ -33,23 +33,27 @@ def forwardSelection(data: list[list[float]], classes: list[int], numFeatures: i
     currentFeatures: set[int] = set()
     bestFeatures: set[int] = set()
     bestAccuracy: float = 0.0
+
     print("Beginning search.")
+
     for _ in range(numFeatures):
         currentBestAccuracy: float = 0.0
         currentBestFeature: int = -1
         for feature in range(numFeatures):
             if feature in currentFeatures: continue # skip the features we already have
-            newset = currentFeatures.union({feature}) # create a new set of features by adding the current feature with our current set
-            accuracy: float = nearestNeighbor(data, classes, newset) # find the accuracy with the new set of features
-            print(f"Using feature(s) {newset} accuracy is {accuracy * 100:.2f}%")
+            mergedset = currentFeatures.union({feature}) # create a new set of features by adding the current feature with our current set
+            accuracy: float = nearestNeighbor(data, classes, mergedset) # find the accuracy with the new set of features
+            feature_str: str = "{" + ",".join(str(x + 1) for x in sorted(mergedset)) + "}"
+            print(f"Using feature(s) {feature_str} accuracy is {accuracy * 100:.2f}%")
             if accuracy > currentBestAccuracy: # if the accuracy is better than what we have so far update our current best accuracy and feature for the current level
                 currentBestAccuracy = accuracy
                 currentBestFeature = feature
         currentFeatures.add(currentBestFeature) # add the best feature for this level to our current set of features
-        print(f"Feature set {currentFeatures} was best, with an accuracy of {currentBestAccuracy * 100:.2f}%\n")
+        level_str: str = "{" + ",".join(str(x + 1) for x in sorted(currentFeatures)) + "}"
+        print(f"Feature set {level_str} was best, with an accuracy of {currentBestAccuracy * 100:.2f}%\n")
         if currentBestAccuracy > bestAccuracy:
             bestAccuracy = currentBestAccuracy
-            bestFeatures = currentFeatures
+            bestFeatures = set(currentFeatures)
 
     print(f"Finished search!! The best feature subset is {bestFeatures}, which has an accuracy of {bestAccuracy * 100:.2f}%")
 
