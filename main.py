@@ -49,17 +49,37 @@ def forwardSelection(data: list[list[float]], classes: list[int], numFeatures: i
                 currentBestAccuracy = accuracy
                 currentBestFeature = feature
         currentFeatures.add(currentBestFeature) # add the best feature for this level to our current set of features
-        level_str: str = "{" + ",".join(str(x + 1) for x in sorted(currentFeatures)) + "}"
-        print(f"Feature set {level_str} was best, with an accuracy of {currentBestAccuracy * 100:.2f}%\n")
+        level_text: str = "{" + ",".join(str(x + 1) for x in sorted(currentFeatures)) + "}"
+        print(f"Feature set {level_text} was best, with an accuracy of {currentBestAccuracy * 100:.2f}%\n")
         if currentBestAccuracy > bestAccuracy:
             bestAccuracy = currentBestAccuracy
             bestFeatures = set(currentFeatures)
-
     print(f"Finished search!! The best feature subset is {bestFeatures}, which has an accuracy of {bestAccuracy * 100:.2f}%")
 
 def backwardsElimination(data: list[list[float]], classes: list[int], numFeatures: int) -> None:
+    currentFeatures: set[int] = set(range(numFeatures))
+    bestFeatures: set[int] = set(currentFeatures)
+    bestAccuracy: float = nearestNeighbor(data, classes, currentFeatures)
     print("Beginning search.")
-
+    for _ in range(numFeatures - 1):
+        currentBestAccuracy: float = 0.0
+        featureToRemove: int = -1
+        for feature in currentFeatures:
+            mergedset = currentFeatures.difference({feature}) # create a new set of features by removing the current feature from our current set
+            accuracy: float = nearestNeighbor(data, classes, mergedset) # find the accuracy with the new set of features
+            feature_str: str = "{" + ",".join(str(x + 1) for x in sorted(mergedset)) + "}"
+            print(f"Using feature(s) {feature_str} accuracy is {accuracy * 100:.2f}%")
+            if accuracy > currentBestAccuracy: # if the accuracy is better than what we have so far update our current best accuracy and feature to remove for the current level
+                currentBestAccuracy = accuracy
+                featureToRemove = feature
+        currentFeatures.remove(featureToRemove) # remove the feature for this level from our current set of features
+        level_text: str = "{" + ",".join(str(x + 1) for x in sorted(currentFeatures)) + "}"
+        print(f"Feature set {level_text} was best, with an accuracy of {currentBestAccuracy * 100:.2f}%\n")
+        if currentBestAccuracy > bestAccuracy:
+            bestAccuracy = currentBestAccuracy
+            bestFeatures = set(currentFeatures)
+    bestText: str = "{" + ",".join(str(x + 1) for x in sorted(bestFeatures)) + "}"
+    print(f"Finished search!! The best feature subset is {bestText}, which has an accuracy of {bestAccuracy * 100:.2f}%")
 
 def main():
     print("Welcome to Stanley's Search Algorithm!\n")
