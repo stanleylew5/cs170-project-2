@@ -1,5 +1,7 @@
 import math
 
+bestSoFar: float = 0.0
+
 def organizeData(fileName: str) -> tuple[list[list[float]], list[int]]:
     data: list[list[float]] = []
     classes: list[int] = []
@@ -15,8 +17,10 @@ def euclideanDistance(x: list[float], y: list[float], featureIndices: set[int]) 
     return math.sqrt(sum([(x[i] - y[i]) ** 2 for i in featureIndices]))
 
 def nearestNeighbor(data: list[list[float]], classes: list[int], featureIndices: set[int]) -> float:
+    global bestSoFar
     n: int = len(data) # of instances
     correct: int = 0
+
     for i in range(n):
         nearestNeighborDistance: float = float('inf')
         nearestNeighborClass: int = -1
@@ -27,9 +31,16 @@ def nearestNeighbor(data: list[list[float]], classes: list[int], featureIndices:
                 nearestNeighborDistance = distance
                 nearestNeighborClass = classes[j]
         if nearestNeighborClass == classes[i]: correct += 1
+
+        remaining: int = n - i - 1
+        if (correct + remaining) / n <= bestSoFar: return (correct + remaining) / n
+
+    if correct / n > bestSoFar: bestSoFar = correct / n
     return correct / n
 
 def forwardSelection(data: list[list[float]], classes: list[int], numFeatures: int) -> None:
+    global bestSoFar
+    bestSoFar = 0.0
     currentFeatures: set[int] = set()
     bestFeatures: set[int] = set()
     bestAccuracy: float = 0.0
@@ -54,9 +65,12 @@ def forwardSelection(data: list[list[float]], classes: list[int], numFeatures: i
         if currentBestAccuracy > bestAccuracy:
             bestAccuracy = currentBestAccuracy
             bestFeatures = set(currentFeatures)
-    print(f"Finished search!! The best feature subset is {bestFeatures}, which has an accuracy of {bestAccuracy * 100:.2f}%")
+    bestText: str = "{" + ",".join(str(x + 1) for x in sorted(bestFeatures)) + "}"
+    print(f"Finished search!! The best feature subset is {bestText}, which has an accuracy of {bestAccuracy * 100:.2f}%")
 
 def backwardsElimination(data: list[list[float]], classes: list[int], numFeatures: int) -> None:
+    global bestSoFarAccuracy 
+    bestSoFarAccuracy = 0.0
     currentFeatures: set[int] = set(range(numFeatures))
     bestFeatures: set[int] = set(currentFeatures)
     bestAccuracy: float = nearestNeighbor(data, classes, currentFeatures)
