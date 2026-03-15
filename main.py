@@ -1,6 +1,5 @@
 import math
-
-bestSoFar: float = 0.0
+import time
 
 def organizeData(fileName: str) -> tuple[list[list[float]], list[int]]:
     data: list[list[float]] = []
@@ -17,7 +16,6 @@ def euclideanDistance(x: list[float], y: list[float], featureIndices: set[int]) 
     return math.sqrt(sum([(x[i] - y[i]) ** 2 for i in featureIndices]))
 
 def nearestNeighbor(data: list[list[float]], classes: list[int], featureIndices: set[int]) -> float:
-    global bestSoFar
     n: int = len(data) # of instances
     correct: int = 0
 
@@ -32,15 +30,9 @@ def nearestNeighbor(data: list[list[float]], classes: list[int], featureIndices:
                 nearestNeighborClass = classes[j]
         if nearestNeighborClass == classes[i]: correct += 1
 
-        remaining: int = n - i - 1
-        if (correct + remaining) / n <= bestSoFar: return (correct + remaining) / n
-
-    if correct / n > bestSoFar: bestSoFar = correct / n
     return correct / n
 
 def forwardSelection(data: list[list[float]], classes: list[int], numFeatures: int) -> None:
-    global bestSoFar
-    bestSoFar = 0.0
     currentFeatures: set[int] = set()
     bestFeatures: set[int] = set()
     bestAccuracy: float = 0.0
@@ -69,8 +61,6 @@ def forwardSelection(data: list[list[float]], classes: list[int], numFeatures: i
     print(f"Finished search!! The best feature subset is {bestText}, which has an accuracy of {bestAccuracy * 100:.2f}%")
 
 def backwardsElimination(data: list[list[float]], classes: list[int], numFeatures: int) -> None:
-    global bestSoFarAccuracy 
-    bestSoFarAccuracy = 0.0
     currentFeatures: set[int] = set(range(numFeatures))
     bestFeatures: set[int] = set(currentFeatures)
     bestAccuracy: float = nearestNeighbor(data, classes, currentFeatures)
@@ -113,10 +103,12 @@ def main():
     print(f"This dataset has {numFeatures} features (not including the class attribute), with {numInstances} instances.\n")
     print(f"Running nearest neighbor with all {numFeatures} features, using \"leave-one-out\" evaluation, I get an accuracy of {nearestNeighborAccuracy * 100:.2f}%")
 
+    start = time.time()
     match algorithm:
         case "1": forwardSelection(data, classes, numFeatures)
         case "2": backwardsElimination(data, classes, numFeatures)
         case _: print("Invalid algorithm choice. Goodbye!")
-    
+    end = time.time()
+    print(f"Total time taken: {end - start:.2f} seconds")
 if __name__ == "__main__":
     main()
